@@ -1,0 +1,156 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>English → Telugu Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+    <h1 class="text-2xl font-bold mt-6 mb-4 text-blue-700">🗣️ English → Telugu Chatbot</h1>
+
+    <div id="chat-box" class="w-full max-w-lg bg-white shadow-lg rounded-2xl p-4 h-[70vh] overflow-y-auto mb-4"></div>
+
+    <form id="chat-form" class="w-full max-w-lg flex items-center gap-2">
+        <input id="message" name="message" type="text" placeholder="Type English text..."
+               class="flex-1 border p-2 rounded-lg" />
+        <input id="file" name="file" type="file" accept="image/*" class="hidden" />
+        <label for="file" class="cursor-pointer bg-blue-500 text-white px-3 py-2 rounded-lg">📷</label>
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg">Send</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const chatBox = document.getElementById('chat-box');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const messageInput = document.getElementById('message');
+            const fileInput = document.getElementById('file');
+            const formData = new FormData();
+
+            if (messageInput.value.trim()) formData.append('message', messageInput.value.trim());
+            if (fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
+
+            addMessage('🧑‍💻 You: ' + (messageInput.value || '📷 Image uploaded'), 'right');
+            messageInput.value = '';
+            fileInput.value = '';
+
+            const res = await fetch('/chat/', { method: 'POST', body: formData });
+            const data = await res.json();
+
+            if (data.error) {
+                addMessage('⚠️ Error: ' + data.error, 'left');
+            } else {
+                addMessage('🧠 English: ' + data.english_text, 'left');
+                addMessage('💬 Telugu: ' + data.telugu_translation, 'left');
+
+                // 🔊 Speak Telugu translation
+                speakTelugu(data.telugu_translation);
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        function addMessage(text, side) {
+            const msg = document.createElement('div');
+            msg.className = `my-2 p-2 rounded-lg max-w-[80%] ${side === 'right' ? 'bg-blue-100 self-end ml-auto' : 'bg-gray-200'}`;
+            msg.textContent = text;
+            chatBox.appendChild(msg);
+        }
+
+        function speakTelugu(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'te-IN'; // Telugu locale
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                speechSynthesis.speak(utterance);
+            } else {
+                console.warn("Speech synthesis not supported in this browser.");
+            }
+        }
+    </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>English → Telugu Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+    <h1 class="text-2xl font-bold mt-6 mb-4 text-blue-700">🗣️ English → Telugu Chatbot</h1>
+
+    <div id="chat-box" class="w-full max-w-lg bg-white shadow-lg rounded-2xl p-4 h-[70vh] overflow-y-auto mb-4"></div>
+
+    <form id="chat-form" class="w-full max-w-lg flex items-center gap-2">
+        <input id="message" name="message" type="text" placeholder="Type English text..."
+               class="flex-1 border p-2 rounded-lg" />
+        <input id="file" name="file" type="file" accept="image/*" class="hidden" />
+        <label for="file" class="cursor-pointer bg-blue-500 text-white px-3 py-2 rounded-lg">📷</label>
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg">Send</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const chatBox = document.getElementById('chat-box');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const messageInput = document.getElementById('message');
+            const fileInput = document.getElementById('file');
+            const formData = new FormData();
+
+            if (messageInput.value.trim()) formData.append('message', messageInput.value.trim());
+            if (fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
+
+            addMessage('🧑‍💻 You: ' + (messageInput.value || '📷 Image uploaded'), 'right');
+            messageInput.value = '';
+            fileInput.value = '';
+
+            const res = await fetch('/chat/', { method: 'POST', body: formData });
+            const data = await res.json();
+
+            if (data.error) {
+                addMessage('⚠️ Error: ' + data.error, 'left');
+            } else {
+                addMessage('🧠 English: ' + (data.english_text || '—'), 'left');
+
+                // ✅ Unified Telugu output handling
+                const teluguOutput = data.telugu_output || data.telugu_readable || data.telugu_translation || '—';
+                addMessage('💬 Telugu: ' + teluguOutput, 'left');
+
+                // 🔊 Speak Telugu text aloud
+                speakTelugu(teluguOutput);
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        function addMessage(text, side) {
+            const msg = document.createElement('div');
+            msg.className = `my-2 p-2 rounded-lg max-w-[80%] ${
+                side === 'right' ? 'bg-blue-100 self-end ml-auto' : 'bg-gray-200'
+            }`;
+            msg.textContent = text;
+            chatBox.appendChild(msg);
+        }
+
+        function speakTelugu(text) {
+            if ('speechSynthesis' in window && text && text !== '—') {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'te-IN'; // Telugu voice
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                speechSynthesis.speak(utterance);
+            } else {
+                console.warn('Speech synthesis not supported or text missing.');
+            }
+        }
+    </script>
+</body>
+</html>
+
